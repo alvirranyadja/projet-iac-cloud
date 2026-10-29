@@ -1,0 +1,31 @@
+---
+- name: Ensure Nginx is installed
+  apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: Configure Nginx reverse proxy
+  template:
+    src: reverse_proxy.conf.j2
+    dest: /etc/nginx/sites-available/webapp
+  notify: Reload Nginx
+
+- name: Enable webapp site
+  file:
+    src: /etc/nginx/sites-available/webapp
+    dest: /etc/nginx/sites-enabled/webapp
+    state: link
+  notify: Reload Nginx
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload Nginx
+
+- name: Ensure Nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: true

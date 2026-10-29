@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymybuddy
+  namespace: paymybuddy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paymybuddy
+  template:
+    metadata:
+      labels:
+        app: paymybuddy
+    spec:
+      containers:
+        - name: paymybuddy
+          image: alvirra/paymybuddy:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql:3306/paymybuddy
+            - name: SPRING_DATASOURCE_USERNAME
+              value: paymybuddy
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: paymybuddy
+          volumeMounts:
+            - name: app-data
+              mountPath: /data
+      volumes:
+        - name: app-data
+          hostPath:
+            path: /data/paymybuddy
+            type: DirectoryOrCreate

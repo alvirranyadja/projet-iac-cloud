@@ -1,0 +1,7 @@
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.pem
+jenkins_ec2.txt
+*.retry
+__pycache__/

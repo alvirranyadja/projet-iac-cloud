@@ -1,0 +1,47 @@
+---
+- name: Ensure Docker is installed
+  apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+    state: present
+    update_cache: true
+
+- name: Ensure Docker service is started
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Create app directory
+  file:
+    path: /opt/webapp
+    state: directory
+    mode: "0755"
+
+- name: Deploy docker-compose for webapp
+  copy:
+    dest: /opt/webapp/docker-compose.yml
+    content: |
+      services:
+        webapp:
+          image: "{{ webapp_image }}"
+          container_name: webapp
+          restart: unless-stopped
+          expose:
+            - "{{ webapp_port }}"
+          networks:
+            - appnet
+      networks:
+        appnet:
+          external: true
+
+- name: Ensure app network exists
+  community.docker.docker_network:
+    name: appnet
+    state: present
+
+- name: Start webapp stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/webapp
+    state: present
